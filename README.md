@@ -22,6 +22,8 @@ npm install
 npm run tauri dev
 ```
 
+For a full Windows processing setup on another PC, see [SETUP_WINDOWS.md](SETUP_WINDOWS.md).
+
 The **Remove watermark** button currently uses the existing local research workflow when it is present next to the app on Windows. It writes a new `*_flux2_klein_2x.png` file beside the selected source image and never replaces an existing output. The UI can also open an existing result, compare it with the source, and save a copy.
 
 The **Remove card text** button detects high-confidence text, repaints complex regions with the local FLUX.2 Klein research model, and writes a new `*_text_removed.png` beside the source. An optional checkbox includes vertical text. Plain white text areas are filled directly, and compact emblems are preserved when the underlying graphic is uncertain. It does not require a manual mask. The result is experimental: false detections can alter decoration, and missed text remains.
