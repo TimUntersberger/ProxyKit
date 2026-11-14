@@ -28,6 +28,8 @@ The **Remove watermark** button currently uses the existing local research workf
 
 The **Remove card text** button detects high-confidence text, repaints complex regions with the local FLUX.2 Klein research model, and writes a new `*_text_removed.png` beside the source. An optional checkbox includes vertical text. Plain white text areas are filled directly, and compact emblems are preserved when the underlying graphic is uncertain. It does not require a manual mask. The result is experimental: false detections can alter decoration, and missed text remains.
 
+The **Card generator** tab renders a blue Character card locally from manually entered fields and an optional artwork image. It previews and downloads a 1000 × 1398 PNG. Its geometry follows the supplied OP17-049 reference; see [CARD_LAYOUT_REFERENCE.md](CARD_LAYOUT_REFERENCE.md) for measurements and current fidelity limits. It does not extract clean artwork from an existing card.
+
 ## Repository contents
 
 This repository contains source code, scripts, tests, and research notes. Downloaded model weights, Python environments, sample card images, generated outputs, and local run folders are excluded. The Tauri UI builds without those files, but the Windows research actions need locally installed environments and models in `research/`. The app does not yet bundle those dependencies or provide a macOS processing backend.

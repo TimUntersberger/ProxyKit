@@ -1,6 +1,7 @@
 import { invoke, isTauri } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { open, save } from "@tauri-apps/plugin-dialog";
+import { initCardGenerator } from "./card-generator";
 
 type ImagePayload = { path: string; name: string; data_url: string; bytes: number };
 type EngineStatus = { available: boolean; detail: string };
@@ -433,6 +434,17 @@ document.querySelectorAll<HTMLButtonElement>("[data-view]").forEach(button => {
 });
 
 render();
+initCardGenerator();
+const showPage = (page: "repair" | "card") => {
+  el<HTMLElement>("repair-page").classList.toggle("hidden", page !== "repair");
+  el<HTMLElement>("card-page").classList.toggle("hidden", page !== "card");
+  el<HTMLElement>("nav-repair").classList.toggle("active", page === "repair");
+  el<HTMLElement>("nav-card").classList.toggle("active", page === "card");
+  el<HTMLElement>("page-title").textContent = page === "card" ? "Card generator" : "Image repair";
+  if (page === "repair") fitStage();
+};
+el<HTMLButtonElement>("nav-repair").addEventListener("click", () => showPage("repair"));
+el<HTMLButtonElement>("nav-card").addEventListener("click", () => showPage("card"));
 if (isTauri()) {
   invoke<EngineStatus>("engine_status").then(status => { engine = status; render(); })
     .catch(error => { engine = { available: false, detail: String(error) }; render(); });
