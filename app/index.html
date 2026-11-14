@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#11131b" />
+    <link rel="stylesheet" href="/src/styles.css" />
+    <link rel="stylesheet" href="/src/interactive.css" />
+    <title>ProxyKit</title>
+    <script type="module" src="/src/main.ts" defer></script>
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="brand"><span class="brand-mark">◈</span><span>ProxyKit<small>LOCAL IMAGE STUDIO</small></span></div>
+        <div class="sidebar-label">WORKSPACE</div>
+        <div class="nav-item active"><span>▣</span> Image repair</div>
+        <div class="sidebar-spacer"></div>
+        <div class="engine-card">
+          <div class="engine-title"><span id="engine-dot" class="status-dot"></span>Engine status</div>
+          <p id="engine-status">Checking local engine…</p>
+        </div>
+        <div class="sidebar-footer">Research preview · v0.1</div>
+      </aside>
+      <main class="main">
+        <header class="topbar"><span>Image repair</span><span class="topbar-right">Runs locally on your machine</span></header>
+        <section class="page">
+          <div class="heading-row">
+            <div><div class="eyebrow">LOCAL IMAGE REPAIR</div><h1>Restore your image</h1><p class="intro">Remove a watermark or printed card text, then compare the result before exporting.</p></div>
+            <span class="local-badge"><span class="status-dot"></span> Local workspace</span>
+          </div>
+          <div class="work-grid">
+            <section class="panel setup-panel">
+              <div class="panel-heading"><span class="step">01</span><div><h2>Source image</h2><p>PNG, JPEG, or WebP</p></div></div>
+              <button id="open-original" class="upload-box" type="button"><span class="upload-icon">＋</span><strong>Choose an image</strong><span>Open a file from your computer</span></button>
+              <div id="source-file" class="file-card hidden"><div class="file-icon">▧</div><div class="file-copy"><strong id="source-name"></strong><span id="source-meta"></span></div><button id="change-original" class="text-button" type="button">Change</button></div>
+              <div class="divider"></div>
+              <div class="panel-heading"><span class="step">02</span><div><h2>Repair</h2><p>Choose a local research workflow</p></div></div>
+              <button id="run-button" class="primary-button" type="button" disabled><span>✦</span><span id="run-label">Remove watermark</span><span class="button-arrow">→</span></button>
+              <fieldset class="version-option"><legend>Repaint version</legend><div class="version-toggle"><label><input type="radio" name="watermark-version" value="standard" checked /><span>Standard</span></label><label><input type="radio" name="watermark-version" value="alternate" /><span>Alternate</span></label></div></fieldset>
+              <p id="run-help" class="help-text">Choose a source image to begin.</p>
+              <button id="text-run-button" class="secondary-button text-run-button" type="button" disabled>Remove card text <span>→</span></button>
+              <label class="text-option"><input id="include-vertical" type="checkbox" /> Include vertical text</label>
+              <p id="text-run-help" class="help-text">Detects high-confidence horizontal text automatically.</p>
+              <button id="extract-effects" class="secondary-button effect-button" type="button" disabled>Extract card effects <span>→</span></button>
+              <div id="effect-draft" class="effect-draft hidden"><label for="effect-text">Original effect text · correct OCR errors here</label><textarea id="effect-text" spellcheck="false"></textarea><button id="copy-effect-text" class="secondary-button" type="button">Copy original text <span>⧉</span></button><div class="translation-options"><label for="effect-language">Original language</label><select id="effect-language"><option value="ja">Japanese</option><option value="fr">French</option></select></div><button id="translate-effects" class="secondary-button" type="button">Translate to English locally <span>→</span></button><p id="effect-path" class="path-note"></p></div>
+              <div id="translation-draft" class="effect-draft hidden"><label for="translation-text">English translation draft · verify card rules</label><textarea id="translation-text" spellcheck="false"></textarea><p id="translation-warnings" class="translation-warnings hidden"></p><button id="copy-translation" class="secondary-button" type="button">Copy English text <span>⧉</span></button><p id="translation-path" class="path-note"></p></div>
+              <div id="progress-card" class="progress-card hidden" role="status">
+                <div class="progress-head"><span id="progress-indicator" class="progress-indicator"></span><strong id="progress-step">Preparing repair</strong><span id="progress-elapsed">0:00</span></div>
+                <div class="activity-track"><span id="activity-bar"></span></div>
+                <p id="progress-detail">Starting the local workflow…</p>
+                <details><summary>Activity log</summary><pre id="progress-log"></pre></details>
+              </div>
+              <div class="divider"></div>
+              <div class="panel-heading"><span class="step">03</span><div><h2>Result</h2><p>Review or bring in an existing output</p></div></div>
+              <button id="open-result" class="secondary-button" type="button">Open an existing result <span>↗</span></button>
+              <button id="export-button" class="secondary-button export-button" type="button" disabled>Save a copy <span>↓</span></button>
+              <p id="result-path" class="path-note"></p>
+            </section>
+            <section class="panel preview-panel">
+              <div class="preview-head"><div><h2>Preview</h2><p id="preview-subtitle">Your image will appear here</p></div><div id="view-toggle" class="segmented hidden"><button data-view="before" type="button">Before</button><button data-view="compare" class="selected" type="button">Compare</button><button data-view="after" type="button">After</button></div></div>
+              <div id="preview-tools" class="preview-tools hidden"><span>Scroll to zoom · Drag to pan</span><div class="zoom-controls"><button id="zoom-out" type="button" aria-label="Zoom out">−</button><button id="zoom-fit" type="button">Fit</button><span id="zoom-label">100%</span><button id="zoom-in" type="button" aria-label="Zoom in">+</button></div></div>
+              <div id="preview-stage" class="preview-stage">
+                <div id="empty-state" class="empty-state"><div class="empty-icon">◇</div><strong>A fresh perspective starts here</strong><span>Choose an image to preview it in your workspace.</span></div>
+                <div id="image-stage" class="image-stage hidden">
+                  <img id="before-image" alt="Original image" />
+                  <img id="after-image" class="after-image hidden" alt="Repaired image" />
+                  <div id="split-line" class="split-line hidden" role="slider" tabindex="0" aria-label="Before and after comparison" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"><span>↔</span></div>
+                </div>
+              </div>
+              <div id="compare-controls" class="compare-controls hidden"><span>ORIGINAL</span><input id="compare-slider" aria-label="Before and after comparison" type="range" min="0" max="100" value="50" /><span>REPAIRED</span></div>
+              <div id="notice" class="notice hidden" role="status"></div>
+            </section>
+          </div>
+          <p class="footnote">The experimental repair engine is kept in <code>research/</code>. The desktop UI is Tauri, TypeScript, and Rust.</p>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
