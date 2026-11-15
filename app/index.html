@@ -76,22 +76,39 @@
           <p class="footnote">The experimental repair engine is kept in <code>research/</code>. The desktop UI is Tauri, TypeScript, and Rust.</p>
         </section>
         <section id="card-page" class="page hidden">
-          <div class="heading-row"><div><div class="eyebrow">LOCAL CARD RENDERER</div><h1>Create a card</h1><p class="intro">Enter card data, add artwork, and export a PNG using the measured blue Character layout.</p></div><span class="local-badge"><span class="status-dot"></span> Local workspace</span></div>
+          <div class="heading-row"><div><div class="eyebrow">LOCAL CARD RENDERER</div><h1>Create a card</h1><p class="intro">Enter card data, add artwork, and export a PNG using the measured Character layout.</p></div><span class="local-badge"><span class="status-dot"></span> Local workspace</span></div>
           <div class="work-grid card-work-grid">
             <section class="panel setup-panel card-form">
               <h2>Card details</h2>
               <label>Artwork <input id="card-artwork" type="file" accept="image/png,image/jpeg,image/webp" /></label>
               <div class="card-form-row"><label>Cost <input id="card-cost" type="number" min="0" max="99" value="5" /></label><label>Power <input id="card-power" type="number" min="0" max="99999" step="1000" value="7000" /></label></div>
+              <label>Counter <select id="card-counter"><option value="0">0</option><option value="1000">1000</option><option value="2000">2000</option></select></label>
+              <label class="card-counter-outline"><input id="card-counter-outline" type="checkbox" checked /> Outline counter text and bolt</label>
               <label>Name <input id="card-name" type="text" value="Charlotte Linlin" /></label>
               <label>Type <input id="card-type" type="text" value="Rocks Pirates" /></label>
-              <p class="help-text">Template: Blue Character. Other card frames need separate measured templates.</p>
-              <label>Effect text <textarea id="card-effect" spellcheck="false">[On Play] Your opponent chooses one:
+              <label>Frame color <select id="card-frame-color"><option value="blue">Blue</option><option value="black">Black</option><option value="green">Green</option><option value="red">Red</option><option value="yellow">Yellow</option><option value="purple">Purple</option></select></label>
+              <label>Outer border <select id="card-outer-border"><option value="normal">Normal</option><option value="super-rare">Super Rare</option><option value="secret-rare">Secret Rare</option><option value="hidden">Hidden</option></select></label>
+              <label>Colored border <select id="card-colored-border"><option value="visible">Visible</option><option value="hidden">Hidden</option></select></label>
+              <label>Effect background <select id="card-effect-background"><option value="panel">Translucent panel</option><option value="existing-panel">Existing panel</option><option value="artwork">Artwork with outlined text</option></select></label>
+              <fieldset class="card-attributes" aria-describedby="card-attribute-help">
+                <legend>Attributes</legend>
+                <div id="card-attribute-options"></div>
+                <p id="card-attribute-help" class="help-text">Choose 1 or 2 attributes.</p>
+              </fieldset>
+              <label>Effect text <textarea id="card-effect" spellcheck="false" aria-describedby="card-effect-help">[On Play] Your opponent chooses one:
 * Draw 2 cards.
 * Your opponent trashes 2 cards from their hand.
 
 [On Your Opponent's Attack] [Once Per Turn] You may trash 1 card from your hand: Up to 1 of your Leader or Characters gains +1000 power during this battle.</textarea></label>
+              <p id="card-effect-help" class="help-text">Wrap a phrase in **double asterisks** to make it bold.</p>
               <div class="card-form-row"><label>Card number <input id="card-number" type="text" value="OP17-049" /></label><label>Rarity <input id="card-rarity" type="text" value="R" /></label></div>
+              <label>Block number <input id="card-block-number" type="number" min="0" step="1" value="5" /></label>
               <p id="card-warning" class="help-text" role="status"></p>
+              <div class="card-form-row">
+                <button id="card-import" class="secondary-button" type="button">Import card</button>
+                <button id="card-export" class="secondary-button" type="button">Export card</button>
+              </div>
+              <input id="card-import-file" type="file" accept=".json,application/json" hidden />
               <button id="card-download" class="primary-button" type="button">Download PNG <span>↓</span></button>
             </section>
             <section class="panel card-preview-panel"><div class="preview-head"><div><h2>Live preview</h2><p>Reference layout · 1000 × 1398 PNG</p></div></div><div class="card-canvas-wrap"><canvas id="card-canvas" width="1000" height="1398" aria-label="Generated card preview"></canvas></div></section>

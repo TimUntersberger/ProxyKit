@@ -4,3 +4,55 @@
 .nav-item{width:100%;border:0;background:transparent;text-align:left;cursor:pointer;font:inherit}.nav-item:hover{background:#272a39}.nav-item.active:hover{background:#2c2642}
 .card-work-grid{grid-template-columns:minmax(310px,390px) minmax(400px,1fr)}
 .card-form{display:flex;flex-direction:column;gap:13px}.card-form h2{margin-bottom:4px}.card-form label{display:flex;flex-direction:column;gap:5px;color:#bfc3d0;font-size:11px;font-weight:600}.card-form input,.card-form textarea,.card-form select{width:100%;border:1px solid #424454;border-radius:7px;background:#252735;color:#f1f1f5;font:13px/1.4 Segoe UI,sans-serif;padding:9px 10px}.card-form input[type=file]{font-size:11px}.card-form textarea{min-height:190px;resize:vertical}.card-form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.card-form .help-text{margin:0}.card-preview-panel{display:flex;flex-direction:column;align-items:center;padding-bottom:20px}.card-preview-panel .preview-head{width:100%}.card-canvas-wrap{width:min(100% - 40px, 500px);overflow:visible}.card-canvas-wrap canvas{width:100%;height:auto;display:block;border-radius:15px;box-shadow:0 18px 40px #0008}@media(max-width:850px){.card-work-grid{grid-template-columns:1fr}}
+
+.card-attributes {
+  min-width: 0;
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid #424454;
+  border-radius: 7px;
+}
+
+.card-attributes legend {
+  padding: 0 4px;
+  color: #bfc3d0;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.card-attributes #card-attribute-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  margin-bottom: 5px;
+}
+
+.card-form .card-attributes label {
+  flex-direction: row;
+  align-items: center;
+}
+
+.card-form .card-attributes input {
+  width: auto;
+  margin: 0;
+  accent-color: #088ec6;
+}
+
+.card-form .card-counter-outline {
+  flex-direction: row;
+  align-items: center;
+}
+
+.card-form .card-counter-outline input {
+  width: auto;
+  margin: 0;
+  accent-color: #088ec6;
+}
+
+@font-face {
+  font-family: Roboto;
+  src: url("/fonts/Roboto.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}

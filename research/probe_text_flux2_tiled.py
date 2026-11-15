@@ -18,6 +18,43 @@ def limits(region: dict) -> tuple[int, int, int, int]:
     return int(points[:, 0].min()), int(points[:, 1].min()), int(points[:, 0].max()), int(points[:, 1].max())
 
 
+def effect_text_mask(source: np.ndarray, regions: list[dict]) -> tuple[list[dict], np.ndarray]:
+    """Find ink and its outline near OCR lines in the lower rules panel."""
+    height, width = source.shape[:2]
+    remaining = []
+    search = np.zeros((height, width), dtype=np.uint8)
+    glyph_size = max(1, round(width / 350))
+    for region in regions:
+        x0, y0, x1, y1 = limits(region)
+        line_height = y1 - y0
+        if (region.get("rotation", 0) != 0 or not height * .59 < (y0 + y1) / 2 < height * .84
+                or x0 < width * .045 or x1 > width * .96 or line_height > height * .045):
+            remaining.append(region)
+            continue
+        # Furigana can sit a half text-line above the recognized base glyphs.
+        top = max(round(height * .59), y0 - round(line_height * .50))
+        search[top:y1 + glyph_size + 1, max(0, x0 - glyph_size):x1 + glyph_size + 1] = 1
+
+    red, green, blue = source.astype(np.int16).transpose(2, 0, 1)
+    bright = np.maximum(np.maximum(red, green), blue)
+    white = (np.minimum(np.minimum(red, green), blue) >= 225).astype(np.uint8)
+    near_white = cv2.dilate(white, np.ones((glyph_size * 2 + 3,) * 2, np.uint8)) != 0
+    dark_ink = (bright < 95) & ((bright < 40) | near_white)
+    blue_ink = (red < 85) & (green > red + 30) & (blue > green + 12) & (blue < 235)
+    ink = ((dark_ink | blue_ink) & (search != 0)).astype(np.uint8)
+    # Closing fills the cutouts inside solid blue keyword badges. Dilation
+    # picks up antialiasing and the narrow white stroke around each glyph.
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (glyph_size * 2 + 1,) * 2)
+    ink = cv2.morphologyEx(ink, cv2.MORPH_CLOSE, kernel)
+    contours, _ = cv2.findContours(ink, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    cv2.drawContours(ink, contours, -1, 1, cv2.FILLED)
+    halo = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (glyph_size * 2 + 5,) * 2)
+    mask = cv2.dilate(ink, halo) * 255
+    # Keep the top seam of a panel intact when it sits just above the ruby text.
+    mask[search == 0] = 0
+    return remaining, mask
+
+
 def group_regions(regions: list[dict]) -> list[list[dict]]:
     groups = []
     for region in sorted(regions, key=lambda item: limits(item)[1]):
@@ -123,7 +160,12 @@ def main() -> None:
     regions = json.loads(args.detections.read_text(encoding="utf-8"))["regions"]
     if not regions:
         parser.error("No high-confidence text was detected. Try a clearer or larger source image.")
-    model_regions, simple_mask, simple_rgb = split_simple_background_regions(source, regions)
+    other_regions, effect_mask = effect_text_mask(
+        source[:original_height, :original_width], regions,
+    )
+    effect_mask = cv2.copyMakeBorder(effect_mask, 0, height - original_height,
+                                     0, width - original_width, cv2.BORDER_CONSTANT)
+    model_regions, simple_mask, simple_rgb = split_simple_background_regions(source, other_regions)
     groups = group_regions(model_regions)
     jobs = [(index, group, x, y)
             for index, group in enumerate(groups)
@@ -185,6 +227,10 @@ def main() -> None:
     simple_mixed = np.uint8(np.clip(result * (1 - simple_blend) + simple_rgb * simple_blend, 0, 255))
     result[simple_mask != 0] = simple_mixed[simple_mask != 0]
     full_mask = np.maximum(full_mask, simple_mask * 255)
+    if np.any(effect_mask):
+        restored = cv2.inpaint(source, effect_mask, max(2, round(original_width / 220)), cv2.INPAINT_NS)
+        result[effect_mask != 0] = restored[effect_mask != 0]
+        full_mask = np.maximum(full_mask, effect_mask)
     Image.fromarray(result[:original_height, :original_width]).save(args.output)
     Image.fromarray(full_mask[:original_height, :original_width]).save(args.output.with_name(args.output.stem + "_mask.png"))
     print(f"Saved {args.output}; outside-mask changes: "

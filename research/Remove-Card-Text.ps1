@@ -1,6 +1,6 @@
 <#
-Experimental printed-card-text removal. Detects high-confidence horizontal text
-and repaints those regions with the local FLUX.2 Klein model. Outputs a new PNG.
+Experimental printed-card-text removal. Detects high-confidence text, repairs
+the effect panel locally, and uses FLUX.2 Klein for other complex regions.
 #>
 param(
     [Parameter(Mandatory = $true)] [string]$Image,
@@ -49,7 +49,7 @@ if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $detections -PathType L
     throw "Text detection failed. Intermediate files: $runDir"
 }
 
-Write-Host 'Step 2/2: repainting detected text with local FLUX.2 Klein...'
+Write-Host 'Step 2/2: repairing the effect panel and repainting other complex regions...'
 & $fluxPython $repaintScript $imagePath $detections --output $outputPath
 if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $outputPath -PathType Leaf)) {
     throw "Text repaint failed. Intermediate files: $runDir"
